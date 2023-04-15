@@ -1,5 +1,7 @@
 # Img Host Transfer
 
+A Python script for changing image hosting service to google drive. It will download all images from markdown files and upload them to a specific google drive folder. After that, the shared links for newly uploaded images are used to replace old links in the original markdown files.
+
 ## Prerequisites
 
 + Online setting in [Google Cloud](https://console.cloud.google.com/):
@@ -30,3 +32,7 @@ Apply all markdown files in a directory
 ```bash
 $ python python/img_host_transfer.py credentials.json -r ../blog-post/content/posts/
 ```
+
+## Disclaimer
+
+This tool works for me, but it might not work for you. Always make a backup first. I am not responsible for any loss or corruption of data.
