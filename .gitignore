@@ -1,3 +1,5 @@
+.env
 *.json
 *.Identifier
 .venv/
+tmp/
