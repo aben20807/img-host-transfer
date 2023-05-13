@@ -1,3 +1,25 @@
+"""
+The MIT License (MIT)
+
+Copyright (c) 2023 Huang, Po-Hsuan (aben20807@gmail.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
 import glob
 import os
 import re
@@ -83,6 +105,39 @@ def get_image_data_list_from_md(md_file):
 
     return image_data_list
 
+
+def get_imgur_data_list_from_md(md_file):
+    """ used for HackMD """
+    with open(md_file, "r") as f:
+        md_content = f.read()
+    
+    cnt = 0  # for anonymous images and avoid images with same caption
+    image_data_list = []
+
+    pattern = r"(https?://(i.)?imgur.com/[^\ \n)\"]*)"
+    matches = re.findall(pattern, md_content)
+
+    cnt = 0  # for anonymous images and avoid images with same caption
+    image_data_list = []
+    for match in matches:
+        image_caption = ""
+        if image_caption.strip() != "":
+            image_caption = (
+                "".join([x if x.isalnum() else "_" for x in image_caption])[:100]
+                + f"_{cnt}"
+            )
+        else:
+            image_caption = os.path.splitext(os.path.basename(md_file))[0] + f"_{cnt}"
+        cnt += 1
+
+        image_url: str = match[0]
+        if not image_url.startswith("http"):
+            continue
+        image_data = {"caption": image_caption, "url": image_url, "old_url": image_url}
+        print(image_data)
+        image_data_list.append(image_data)
+
+    return image_data_list
 
 def download_image(file_name, image_url):
     """Downloads an image from a URL and saves it to a file."""
@@ -264,6 +319,11 @@ def main():
         type=str,
         help="Path to the directory which contains markdown files.",
     )
+    parser.add_argument(
+        "--hackmd",
+        help="For processing imgur images for HackMD",
+        action='store_true'
+    )
     args = parser.parse_args()
     # load .env file for root_id
     load_dotenv()
@@ -278,11 +338,22 @@ def main():
 
     print(f"Totel: {len(md_files)} markdown file(s)")
     for idx, md_file in enumerate(md_files):
-        # if idx+1 <= 87: # used to continue process after solving issues during runtime
+        # if idx+1 <= 5: # used to continue process after solving issues during runtime
+        #     continue
+        # if "ouo" in md_file: # file to be skip
         #     continue
         print(f"\n\nProcess #{idx+1} {md_file}")
         print("> Find all image links and captions in the markdown file")
-        image_data_list = get_image_data_list_from_md(md_file)
+        if args.hackmd:
+            print("> HackMD mode (replace all imgur images)")
+            image_data_list = get_imgur_data_list_from_md(md_file)
+        else:
+            image_data_list = get_image_data_list_from_md(md_file)
+        
+        if len(image_data_list) == 0:
+            print("> No image found in this markdown file; go to next")
+            continue
+        
         os.makedirs("tmp", exist_ok=True)
 
         print("> Download all images based on the URLs")
