@@ -7,10 +7,10 @@ A Python script for changing image hosting service to google drive. It will down
 + Online setting in [Google Cloud](https://console.cloud.google.com/):
   + New a project and switch on Google Drive API.
   + In the Credentials tab, create a Service Account. In this step, you will download a JSON file and name it `credentials.json`, please keep it secret.
-  + Add the email of the Service Account as an editor to your root folder in google drive, i.e., share the Service Account the permission to modify
-  + Open the permission to read for anybody to make everyone can access the image via the new links from your google drive
+  + Add the email of the Service Account as an editor to your root folder for images to be backed up in google drive, i.e., share the Service Account the permission to modify (**Note: the root folder is not your real root folder but the folder expected to store images**)
+  + In the same configuration page, open the folder permission to read for anybody to make everyone can access the image via the new links from your google drive
 + Local environment:
-  + New a `.env` file, `root_id="<ROOT_ID>"`, where <ROOT_ID> is the root folder ID you want to place generated folders for markdown files. You can access it in your google drive from the folder URL; for example, `https://drive.google.com/drive/u/0/folders/XXXXXXXXXXXXXXXXXXXXXXX`, the `XXXXXXXXXXXXXXXXXXXXXXX` is the folder ID
+  + New a `.env` file, `root_id="<ROOT_ID>"`, where <ROOT_ID> is the mentioned root folder ID you want to place generated folders for markdown files. You can access it in your google drive from the folder URL; for example, `https://drive.google.com/drive/u/0/folders/XXXXXXXXXXXXXXXXXXXXXXX`, the `XXXXXXXXXXXXXXXXXXXXXXX` is the folder ID
   + Open a terminal, clone this repo and cd in, then type:
 
     ```bash
